@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+<title>Estoque · Revenda Natura</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- TELA DE LOGIN -->
+<div id="tela-login" class="tela tela-login">
+  <div class="login-card">
+    <div class="login-brand">
+      <span class="login-leaf">🌿</span>
+      <h1>Estoque</h1>
+      <p>Revenda Natura</p>
+    </div>
+    <div id="pin-display" class="pin-display">
+      <span class="pin-dot"></span><span class="pin-dot"></span>
+      <span class="pin-dot"></span><span class="pin-dot"></span>
+    </div>
+    <div id="pin-erro" class="pin-erro"></div>
+    <div class="pin-pad">
+      <button data-k="1">1</button><button data-k="2">2</button><button data-k="3">3</button>
+      <button data-k="4">4</button><button data-k="5">5</button><button data-k="6">6</button>
+      <button data-k="7">7</button><button data-k="8">8</button><button data-k="9">9</button>
+      <button data-k="apagar" class="tecla-fn">⌫</button><button data-k="0">0</button><button data-k="ok" class="tecla-fn">✓</button>
+    </div>
+  </div>
+</div>
+
+<!-- APP PRINCIPAL -->
+<div id="app" class="tela app hidden">
+
+  <header class="topo">
+    <div class="topo-marca"><span class="login-leaf">🌿</span> Estoque Natura</div>
+    <div class="topo-usuario"><span id="nome-usuario"></span><button id="btn-sair" title="Sair">Sair</button></div>
+  </header>
+
+  <main class="conteudo">
+
+    <!-- DASHBOARD -->
+    <section id="view-dashboard" class="view">
+      <h2>Visão geral</h2>
+      <div class="cards-resumo" id="cards-resumo">
+        <div class="card-resumo"><span class="card-num" id="num-total">–</span><span class="card-label">produtos cadastrados</span></div>
+        <div class="card-resumo alerta"><span class="card-num" id="num-abaixo">–</span><span class="card-label">abaixo do estoque ideal</span></div>
+        <div class="card-resumo critico"><span class="card-num" id="num-zerado">–</span><span class="card-label">sem estoque</span></div>
+        <div class="card-resumo"><span class="card-num" id="num-hoje">–</span><span class="card-label">movimentações hoje</span></div>
+      </div>
+      <h3 class="subtitulo">Últimas movimentações</h3>
+      <div id="lista-recentes" class="lista-movimentacoes"></div>
+    </section>
+
+    <!-- PRODUTOS -->
+    <section id="view-produtos" class="view hidden">
+      <h2>Produtos</h2>
+      <input type="text" id="busca-produto" class="input-busca" placeholder="Buscar por nome ou SKU...">
+      <div id="lista-produtos" class="lista-produtos"></div>
+    </section>
+
+    <!-- HISTÓRICO -->
+    <section id="view-historico" class="view hidden">
+      <h2>Histórico de movimentações</h2>
+      <div id="lista-historico" class="lista-movimentacoes"></div>
+    </section>
+
+    <!-- CURVA ABC -->
+    <section id="view-abc" class="view hidden">
+      <h2>Curva ABC</h2>
+      <p class="texto-apoio">Produtos ordenados por valor de consumo estimado.</p>
+      <table class="tabela-abc">
+        <thead><tr><th>Classe</th><th>Produto</th><th>Categoria</th><th>Preço</th><th>Estoque</th></tr></thead>
+        <tbody id="corpo-abc"></tbody>
+      </table>
+    </section>
+
+  </main>
+
+  <nav class="nav-inferior">
+    <button class="nav-item ativo" data-view="dashboard"><span>📊</span>Visão geral</button>
+    <button class="nav-item" data-view="produtos"><span>📦</span>Produtos</button>
+    <button class="nav-item" data-view="historico"><span>📜</span>Histórico</button>
+    <button class="nav-item" data-view="abc"><span>🌱</span>Curva ABC</button>
+  </nav>
+
+  <!-- BOTÃO FLUTUANTE -->
+  <button id="btn-nova-mov" class="botao-flutuante">+</button>
+
+  <!-- MODAL MOVIMENTAÇÃO -->
+  <div id="modal-mov" class="modal-overlay hidden">
+    <div class="modal">
+      <div class="modal-topo">
+        <h3>Registrar movimentação</h3>
+        <button id="fechar-modal" class="modal-fechar">✕</button>
+      </div>
+
+      <div class="campo">
+        <label>Produto</label>
+        <input type="text" id="mov-busca-produto" placeholder="Digite o nome ou SKU...">
+        <div id="mov-sugestoes" class="sugestoes"></div>
+        <div id="mov-produto-selecionado" class="produto-selecionado hidden"></div>
+      </div>
+
+      <div class="campo tipo-toggle">
+        <button type="button" class="tipo-btn ativo" data-tipo="Entrada">↓ Entrada</button>
+        <button type="button" class="tipo-btn" data-tipo="Saída">↑ Saída</button>
+      </div>
+
+      <div class="campo">
+        <label>Quantidade</label>
+        <input type="number" id="mov-quantidade" min="1" placeholder="0">
+      </div>
+
+      <div class="campo">
+        <label>Motivo (opcional)</label>
+        <input type="text" id="mov-motivo" placeholder="Ex: compra, venda, ajuste...">
+      </div>
+
+      <div id="mov-erro" class="pin-erro"></div>
+      <button id="btn-confirmar-mov" class="botao-primario">Registrar</button>
+    </div>
+  </div>
+
+</div>
+
+<div id="toast" class="toast hidden"></div>
+
+<script src="config.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
