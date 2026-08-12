@@ -59,6 +59,12 @@
     <section id="view-produtos" class="view hidden">
       <h2>Produtos</h2>
       <input type="text" id="busca-produto" class="input-busca" placeholder="Buscar por nome ou SKU...">
+      <div class="filtros-nivel">
+        <button class="filtro-btn ativo" data-filtro="todos">Todos</button>
+        <button class="filtro-btn" data-filtro="abaixo">Abaixo do ideal</button>
+        <button class="filtro-btn" data-filtro="ideal">No ideal</button>
+        <button class="filtro-btn" data-filtro="acima">Acima do ideal</button>
+      </div>
       <div id="lista-produtos" class="lista-produtos"></div>
     </section>
 

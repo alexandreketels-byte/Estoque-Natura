@@ -4,6 +4,7 @@ let usuarioAtual = localStorage.getItem('estoque_usuario') || null;
 let produtos = [];
 let produtoSelecionadoMov = null;
 let tipoMovAtual = 'Entrada';
+let filtroNivelAtual = 'todos';
 
 /* ===================== API ===================== */
 async function chamarApi(action, params = {}) {
@@ -135,7 +136,7 @@ async function carregarProdutos() {
   const res = await chamarApi('listarProdutos');
   if (!res.ok) { lista.innerHTML = '<div class="vazio">Erro ao carregar produtos</div>'; return; }
   produtos = res.produtos;
-  renderizarProdutos(produtos);
+  aplicarFiltrosProdutos();
 }
 
 function classificarSaldo(p) {
@@ -143,6 +144,30 @@ function classificarSaldo(p) {
   if (p.saldoAtual < p.estoqueIdeal) return 'saldo-baixo';
   return 'saldo-ok';
 }
+
+function classificarNivel(p) {
+  if (p.saldoAtual < p.estoqueIdeal) return 'abaixo';
+  if (p.saldoAtual > p.estoqueIdeal) return 'acima';
+  return 'ideal';
+}
+
+function aplicarFiltrosProdutos() {
+  const termo = document.getElementById('busca-produto').value.toLowerCase();
+  const filtrados = produtos.filter(p => {
+    const bateBusca = String(p.nome).toLowerCase().includes(termo) || String(p.sku).includes(termo);
+    const bateNivel = filtroNivelAtual === 'todos' || classificarNivel(p) === filtroNivelAtual;
+    return bateBusca && bateNivel;
+  });
+  renderizarProdutos(filtrados);
+}
+
+document.querySelectorAll('.filtro-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    filtroNivelAtual = btn.dataset.filtro;
+    document.querySelectorAll('.filtro-btn').forEach(b => b.classList.toggle('ativo', b === btn));
+    aplicarFiltrosProdutos();
+  });
+});
 
 function renderizarProdutos(lista) {
   const el = document.getElementById('lista-produtos');
@@ -171,13 +196,7 @@ function renderizarProdutos(lista) {
   });
 }
 
-document.getElementById('busca-produto').addEventListener('input', (e) => {
-  const termo = e.target.value.toLowerCase();
-  const filtrados = produtos.filter(p =>
-    String(p.nome).toLowerCase().includes(termo) || String(p.sku).includes(termo)
-  );
-  renderizarProdutos(filtrados);
-});
+document.getElementById('busca-produto').addEventListener('input', aplicarFiltrosProdutos);
 
 /* ===================== HISTÓRICO ===================== */
 async function carregarHistorico() {
