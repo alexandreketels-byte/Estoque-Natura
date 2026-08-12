@@ -110,6 +110,10 @@ button{font-family:inherit; cursor:pointer;}
 .saldo-baixo .saldo-num{color:var(--ouro);}
 .saldo-critico .saldo-num{color:var(--ferrugem);}
 .barra-nivel{width:60px; height:5px; border-radius:4px; background:var(--linha); margin-top:4px; overflow:hidden;}
+.diff-ideal{font-size:10.5px; margin-top:2px; white-space:nowrap;}
+.diff-acima{color:var(--ouro); font-weight:600;}
+.diff-abaixo{color:var(--ferrugem); font-weight:600;}
+.diff-neutro{color:var(--verde-medio); font-weight:600;}
 .barra-nivel-fill{height:100%;}
 .saldo-ok .barra-nivel-fill{background:var(--verde-medio);}
 .saldo-baixo .barra-nivel-fill{background:var(--ouro);}

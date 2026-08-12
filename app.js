@@ -175,14 +175,19 @@ function renderizarProdutos(lista) {
   el.innerHTML = lista.map(p => {
     const classe = classificarSaldo(p);
     const perc = p.estoqueIdeal > 0 ? Math.min(100, (p.saldoAtual / p.estoqueIdeal) * 100) : 100;
+    const diff = p.saldoAtual - p.estoqueIdeal;
+    let diffHtml = '<span class="diff-neutro">no ideal</span>';
+    if (diff > 0) diffHtml = `<span class="diff-acima">+${diff} acima</span>`;
+    if (diff < 0) diffHtml = `<span class="diff-abaixo">${diff} abaixo</span>`;
     return `
       <div class="item-produto ${classe}" data-sku="${p.sku}">
         <div class="item-produto-info">
           <div class="item-produto-nome">${p.nome}</div>
-          <div class="item-produto-sku">SKU ${p.sku} · ${p.grupo || ''}</div>
+          <div class="item-produto-sku">SKU ${p.sku} · ${p.grupo || ''} · ideal ${p.estoqueIdeal}</div>
         </div>
         <div class="item-produto-saldo">
           <span class="saldo-num">${p.saldoAtual}</span>
+          <div class="diff-ideal">${diffHtml}</div>
           <div class="barra-nivel"><div class="barra-nivel-fill" style="width:${perc}%"></div></div>
         </div>
       </div>`;
