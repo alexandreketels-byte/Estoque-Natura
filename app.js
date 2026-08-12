@@ -339,6 +339,103 @@ document.getElementById('btn-confirmar-mov').addEventListener('click', async () 
   btn.disabled = false; btn.textContent = 'Registrar';
 });
 
+/* ===================== AJUSTE EM MASSA ===================== */
+const modalAjuste = document.getElementById('modal-ajuste');
+let diferencasAjuste = [];
+
+document.getElementById('btn-ajuste-massa').addEventListener('click', () => {
+  document.getElementById('ajuste-texto').value = '';
+  document.getElementById('ajuste-resumo').classList.add('hidden');
+  document.getElementById('ajuste-erro').textContent = '';
+  document.getElementById('ajuste-preview').innerHTML = '';
+  diferencasAjuste = [];
+  modalAjuste.classList.remove('hidden');
+});
+document.getElementById('fechar-modal-ajuste').addEventListener('click', () => modalAjuste.classList.add('hidden'));
+
+function parseListaAjuste(texto) {
+  return texto.split('\n')
+    .map(l => l.trim())
+    .filter(l => l.length)
+    .map(l => {
+      const partes = l.split(/[\t;,]+/).map(p => p.trim());
+      return { sku: partes[0], quantidade: Number(partes[1]) };
+    })
+    .filter(item => item.sku && !isNaN(item.quantidade));
+}
+
+document.getElementById('btn-analisar-ajuste').addEventListener('click', () => {
+  const texto = document.getElementById('ajuste-texto').value;
+  const itens = parseListaAjuste(texto);
+  const erroEl = document.getElementById('ajuste-erro');
+  erroEl.textContent = '';
+
+  if (!itens.length) { erroEl.textContent = 'Nenhum item válido encontrado. Confira o formato.'; return; }
+  if (!produtos.length) { erroEl.textContent = 'Produtos ainda não carregados, tente novamente em instantes.'; return; }
+
+  diferencasAjuste = itens.map(item => {
+    const p = produtos.find(x => String(x.sku) === String(item.sku));
+    if (!p) return { sku: item.sku, ok: false, error: 'SKU não encontrado' };
+    const diff = item.quantidade - p.saldoAtual;
+    return { sku: item.sku, nome: p.nome, saldoAtual: p.saldoAtual, quantidadeInformada: item.quantidade, diff: diff, ok: true };
+  });
+
+  renderizarPreviewAjuste();
+});
+
+function renderizarPreviewAjuste() {
+  const el = document.getElementById('ajuste-preview');
+  const comDiferenca = diferencasAjuste.filter(d => !d.ok || d.diff !== 0);
+  document.getElementById('ajuste-resumo').classList.remove('hidden');
+
+  if (!comDiferenca.length) {
+    el.innerHTML = '<div class="vazio">Nenhuma diferença — estoque já está de acordo com a contagem.</div>';
+    document.getElementById('btn-confirmar-ajuste').classList.add('hidden');
+    return;
+  }
+  document.getElementById('btn-confirmar-ajuste').classList.remove('hidden');
+
+  el.innerHTML = comDiferenca.map(d => {
+    if (!d.ok) {
+      return `<div class="item-ajuste erro"><div class="item-ajuste-nome">SKU ${d.sku}<small>${d.error}</small></div></div>`;
+    }
+    const classe = d.diff > 0 ? 'acima' : 'abaixo';
+    const sinal = d.diff > 0 ? '+' : '';
+    return `
+      <div class="item-ajuste ${classe}">
+        <div class="item-ajuste-nome">${d.nome}<small>SKU ${d.sku} · sistema: ${d.saldoAtual} → contagem: ${d.quantidadeInformada}</small></div>
+        <div class="item-ajuste-diff">${sinal}${d.diff}</div>
+      </div>`;
+  }).join('');
+}
+
+document.getElementById('btn-confirmar-ajuste').addEventListener('click', async () => {
+  const validos = diferencasAjuste.filter(d => d.ok && d.diff !== 0);
+  if (!validos.length) return;
+
+  const erroEl = document.getElementById('ajuste-erro');
+  const btn = document.getElementById('btn-confirmar-ajuste');
+  btn.disabled = true; btn.textContent = 'Aplicando...';
+
+  try {
+    const res = await chamarApiPost('ajustarEstoqueEmMassa', {
+      itens: validos.map(d => ({ sku: d.sku, quantidade: d.quantidadeInformada })),
+      usuario: usuarioAtual
+    });
+    if (res.ok) {
+      mostrarToast(`${res.aplicados} produto(s) ajustado(s)`);
+      modalAjuste.classList.add('hidden');
+      carregarProdutos();
+      carregarDashboard();
+    } else {
+      erroEl.textContent = res.error || 'Erro ao aplicar ajustes';
+    }
+  } catch (e) {
+    erroEl.textContent = 'Erro de conexão';
+  }
+  btn.disabled = false; btn.textContent = 'Aplicar ajustes';
+});
+
 /* ===================== INICIALIZAÇÃO ===================== */
 if (usuarioAtual) {
   entrarNoApp();

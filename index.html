@@ -58,6 +58,7 @@
     <!-- PRODUTOS -->
     <section id="view-produtos" class="view hidden">
       <h2>Produtos</h2>
+      <button id="btn-ajuste-massa" class="link-acao">↻ Ajuste em massa (contagem física)</button>
       <input type="text" id="busca-produto" class="input-busca" placeholder="Buscar por nome ou SKU...">
       <div class="filtros-nivel">
         <button class="filtro-btn ativo" data-filtro="todos">Todos</button>
@@ -128,6 +129,30 @@
 
       <div id="mov-erro" class="pin-erro"></div>
       <button id="btn-confirmar-mov" class="botao-primario">Registrar</button>
+    </div>
+  </div>
+
+  <!-- MODAL AJUSTE EM MASSA -->
+  <div id="modal-ajuste" class="modal-overlay hidden">
+    <div class="modal">
+      <div class="modal-topo">
+        <h3>Ajuste em massa</h3>
+        <button id="fechar-modal-ajuste" class="modal-fechar">✕</button>
+      </div>
+      <p class="texto-apoio">Cole a lista com SKU e quantidade real da contagem física — um item por linha
+        (aceita separado por tab, ; ou ,). Ex: <code>1023;45</code></p>
+
+      <div class="campo">
+        <textarea id="ajuste-texto" rows="6" placeholder="1023;45&#10;1050;12&#10;1102;0"></textarea>
+      </div>
+      <button id="btn-analisar-ajuste" class="botao-secundario">Analisar diferenças</button>
+
+      <div id="ajuste-resumo" class="hidden">
+        <h4 class="subtitulo-modal">Diferenças encontradas</h4>
+        <div id="ajuste-preview" class="lista-ajuste-preview"></div>
+        <div id="ajuste-erro" class="pin-erro"></div>
+        <button id="btn-confirmar-ajuste" class="botao-primario">Aplicar ajustes</button>
+      </div>
     </div>
   </div>
 
